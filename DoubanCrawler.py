@@ -168,14 +168,13 @@ def rate9(movies):
 			movie9List.append(movie)
 	return movie9List
 
-myMovies = splitDetails(getAllMovies(['音乐','爱情','文艺'], ['大陆']))#‘全部地区’和'全部类型'，在url里为空
+all_locations = ['大陆','美国','香港','台湾','日本','韩国','英国','法国','意大利','西班牙','印度','泰国','俄罗斯','伊朗','加拿大','澳大利亚','爱尔兰','瑞典','巴西','丹麦']
+
+myMovies = splitDetails(getAllMovies(['音乐','爱情','文艺'], all_locations))#‘全部地区’和'全部类型'，在url里为空
 
 movies9 = rate9(myMovies)
 
-#for test：csvfile
-#movies9 = rate9(splitDetails(getMovies('爱情', '大陆')))
-
-#把结果写入csv文件
+#把结果movies9写入csv文件
 import csv
 with open('movies.csv', 'w', newline='') as csv_file:# 设置newline，否则两行之间会空一行
 	spamwriter = csv.writer(csv_file)
@@ -194,14 +193,7 @@ with open('movies.csv', 'w', newline='') as csv_file:# 设置newline，否则两
 
 请将你的结果【输出文件】 【output.txt】
 """
-#【全部地区】的【爱情】电影
-love_movies = splitDetails(getAllMovies(['爱情'],['大陆','日本','香港','台湾']))#‘全部地区’在url里为空
-music_movies = splitDetails(getAllMovies(['音乐'],['大陆','日本','香港','台湾']))
-art_movies = splitDetails(getAllMovies(['文艺'],['大陆','日本','香港','台湾']))
-
-#all_loctions = ['大陆','美国','香港','台湾','日本','韩国','英国','法国','意大利','西班牙','印度','泰国','俄罗斯','伊朗','加拿大','澳大利亚','爱尔兰','瑞典','巴西','丹麦']
-
-
+#排序后取前三名，输出tuple
 def getTop3(movies):
 	movie_dict = {}
 	for movie in movies:
@@ -212,13 +204,29 @@ def getTop3(movies):
 	movie_dict_sorted = sorted(movie_dict.items(),key = lambda x:x[1], reverse = True)#返回一个list
 	return movie_dict_sorted[0][0],movie_dict_sorted[1][0],movie_dict_sorted[2][0]
 
-#print(getTop3(love_movies))
-def printTop3(movies):
-	loc1,loc2,loc3 = getTop3(movies)
-	return "The top-3 movies are: {}, {} and {}".format(loc1,loc2,loc3)
+def getPercentage(movies,i):
+	n=0
+	for movie in movies:
+		if movie[2]==getTop3(movies)[i]:
+			n+=1
+	return round((n/len(movies)) *100,2)
 
+#打印
+def printTop3(category,movies):
+	loc1,loc2,loc3 = getTop3(movies)
+	p1 = getPercentage(movies,0)
+	p2 = getPercentage(movies,1)
+	p3 = getPercentage(movies,2)
+	return "The top-3 {} movies are: {}, {} and {}, occupying {}%, {}% and {}%, respectively".format(category,loc1,loc2,loc3,p1,p2,p3)
+
+#【全部地区】的【爱情】【音乐】【文艺】电影
+love_movies = splitDetails(getAllMovies(['爱情'],['大陆','日本','香港']))#‘全部地区’在url里为空
+music_movies = splitDetails(getAllMovies(['音乐'],['大陆','日本','台湾']))
+art_movies = splitDetails(getAllMovies(['文艺'],['大陆','香港','台湾']))
+
+#输出到文件txt
 with open("output.txt", "w") as text_file:
-    print(printTop3(love_movies), file=text_file)
+    print(printTop3('love',love_movies) + "\n" + printTop3('music', music_movies) + "\n"+ printTop3('art', art_movies), file=text_file)
 
 """
 
