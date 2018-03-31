@@ -26,7 +26,7 @@ def getMovieUrl(category, location):
 	"""
 	url = "https://movie.douban.com/tag/#/?sort=S&range=9,10&tags=电影,{},{}".format(category, location)
 	return url
-print(getMovieUrl("movie", "China"))
+#print(getMovieUrl("movie", "China"))
 
 
 
@@ -51,12 +51,30 @@ html = response.text
 
 getHtml 还有【两个可选参数:多页，翻页等待时间】，你 【很有可能】 需要传入非默认的值。
 
+def getMovieDetails(url, category, location):
+	html = expanddouban.getHtml(url, True, 3)#获取html
+	soup = BeautifulSoup(html)#将html变为可以解析的soup对象
+
+	#获取父元素，class必须加下划线
+	parent_a = soup.find("div", class_="list-wp").find_all("a", class_="item")
+	for child in parent_a:
+		name = child.find(span, class_="title").string
+		rate = child.find(span, class_="rate").string
+		info_link = child.get('href')#找到链接，见BeautifulSoup“从文档中找到所有<a>标签的链接”
+		cover_link = child.find('img').get('src')
+		m = Movie(name, rate, location, category, info_link, cover_link)
+		movieList.append(m)
+
+	return
+
 """
 # for test
 #url = "https://movie.douban.com/tag/#/?sort=S&range=9,10&tags=电影,剧情,美国"
+#html = expanddouban.getHtml(url)
+##print(html)
+
 import expanddouban
-html = expanddouban.getHtml(url)
-#print(html)
+from bs4 import BeautifulSoup
 
 """
 任务3: 定义电影类
@@ -83,14 +101,15 @@ m = Movie(name, rate, location, category, info_link, cover_link)
 class Movie(object):
 
     def __init__(self, name, rate, location, category, info_link, cover_link):
-        self.name=name
+        self.name = name
         self.rate = rate
         self.location = location
         self.category = category
         self.info_link = info_link
         self.cover_link = cover_link
 
-m = Movie(name, rate, location, category, info_link, cover_link)
+    def print_movie(self):
+        return "{},{},{},{},{},{}".format(self.name,self.rate,self.location,self.category,self.info_link,self.cover_link)#如果没有这个方法，Movie的每个实例输出为<__main__.Movie object at 0x05977410>
 
 """
 任务4: 获得豆瓣电影的信息
@@ -101,29 +120,67 @@ m = Movie(name, rate, location, category, info_link, cover_link)
 
 提示：你可能需要在这个任务中，使用前三个任务的代码或函数。
 """
-
+#一个类型+一个地区
 def getMovies(category, location):
 	"""
-	return a list of Movie objects with the given category and location.
+	return a list of Movie objects with a given category and location.
 	"""
 	url = getMovieUrl(category, location)
-	html = expanddouban.getHtml(url)
-	
+	html = expanddouban.getHtml(url, True, 3)#获取html
+	soup = BeautifulSoup(html, "html.parser")#将html变为可以解析的soup对象
 
-    return movie_list
+	movieList = []
 
+	#获取父元素，class必须加下划线
+	parent_a = soup.find('div', class_="list-wp").find_all("a", class_="item")
+	for child in parent_a:
+		#从html中获取名称、评分等信息
+		name = child.find('span', class_="title").string
+		rate = child.find('span', class_="rate").string
+		info_link = child.get('href')#找到链接，见BeautifulSoup“从文档中找到所有<a>标签的链接”
+		cover_link = child.find('img').get('src')
+
+		#建立新实例，并添加到list
+		m = Movie(name, rate, location, category, info_link, cover_link).print_movie()
+		movieList.append(m)
+
+	return movieList
+#print(getMovies('爱情', '大陆'))
+
+#多个类型 + 多个地区
+def getAllMovies(categories, locations):
+	"""
+	return a list of Movie objects with a list of given categories and locations.
+	"""
+	allMovies = []
+	for category in categories:
+		for location in locations:
+			#allMovies.append(getMovies(category, location))
+			print(getMovies(category, location))
+			print(getMovies('爱情', '大陆'))
+			print(category)
+			print(location)
+
+			#print(allMovies)
+	return sum(allMovies, [])
 
 """
 任务5: 构造电影信息数据表
 
 从网页上选取你最爱的三个电影类型，然后获取每个地区的电影信息后，
-我们可以获得一个包含【三个类型】、所有【地区】，【评分超过9分】的完整电影对象的列表。
+我们可以获得一个包含【三个类型】、【所有地区】，【评分超过9分】的完整电影对象的列表。
 将列表【输出到文件】 【movies.csv】，格式如下:
 
 肖申克的救赎,9.6,美国,剧情,https://movie.douban.com/subject/1292052/,https://img3.doubanio.com/p480747492.jpg
 霍伊特团队,9.0,香港,动作,https://movie.douban.com/subject/1307914/,https://img3.doubanio.com/p2329853674.jpg
-"""
 
+去除重复？
+
+
+"""
+myMovies = getAllMovies(['爱情'], ['全部地区'])
+
+#print(myMovies)
 """
 任务6: 统计电影数据
 
