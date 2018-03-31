@@ -152,17 +152,17 @@ def getAllMovies(categories, locations):
 	"""
 	return a list of Movie objects with a list of given categories and locations.
 	"""
-	allMovies = []
+	movieList = []
 	for category in categories:
 		for location in locations:
-			#allMovies.append(getMovies(category, location))
-			print(getMovies(category, location))
-			print(getMovies('爱情', '大陆'))
-			print(category)
-			print(location)
+			movieList.append(getMovies(category, location))
+			#print(getMovies(category, location))
+			#print(getMovies('爱情', '大陆'))
+			#print(category)
+			#print(location)
 
-			#print(allMovies)
-	return sum(allMovies, [])
+			#print(movieList)
+	return sum(movieList, [])
 
 """
 任务5: 构造电影信息数据表
@@ -178,9 +178,34 @@ def getAllMovies(categories, locations):
 
 
 """
-myMovies = getAllMovies(['爱情'], ['全部地区'])
-
+#myMovies = getAllMovies(['爱情'], ['全部地区'])
 #print(myMovies)
+
+
+#把每一条电影信息，从一个完全的str，变成可以操作的list
+def splitDetails(list):
+	return [item.split(',') for item in list]
+
+#选择评分9或以上的电影
+def rate9(movies):
+	movieList = []
+	for movie in movies:
+		if float(movie[1]) >= 9.0:
+			movieList.append(movie)
+	return movieList
+
+#print(rate9(splitDetails(getMovies('爱情', '大陆'))))
+
+#for test
+myMovies = rate9(splitDetails(getMovies('爱情', '大陆')))
+
+#把结果写入csv文件
+import csv
+with open('movies.csv', 'w', newline='') as csvFile:# 设置newline，否则两行之间会空一行
+	spamwriter = csv.writer(csvFile)
+	for movie in myMovies:
+		spamwriter.writerow(movie)
+
 """
 任务6: 统计电影数据
 
