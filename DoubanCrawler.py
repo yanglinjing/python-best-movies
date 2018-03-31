@@ -51,22 +51,6 @@ html = response.text
 
 getHtml 还有【两个可选参数:多页，翻页等待时间】，你 【很有可能】 需要传入非默认的值。
 
-def getMovieDetails(url, category, location):
-	html = expanddouban.getHtml(url, True, 3)#获取html
-	soup = BeautifulSoup(html)#将html变为可以解析的soup对象
-
-	#获取父元素，class必须加下划线
-	parent_a = soup.find("div", class_="list-wp").find_all("a", class_="item")
-	for child in parent_a:
-		name = child.find(span, class_="title").string
-		rate = child.find(span, class_="rate").string
-		info_link = child.get('href')#找到链接，见BeautifulSoup“从文档中找到所有<a>标签的链接”
-		cover_link = child.find('img').get('src')
-		m = Movie(name, rate, location, category, info_link, cover_link)
-		movieList.append(m)
-
-	return
-
 """
 # for test
 #url = "https://movie.douban.com/tag/#/?sort=S&range=9,10&tags=电影,剧情,美国"
@@ -145,7 +129,7 @@ def getMovies(category, location):
 		movieList.append(m)
 
 	return movieList
-#print(getMovies('爱情', '大陆'))
+
 
 #多个类型 + 多个地区
 def getAllMovies(categories, locations):
@@ -156,12 +140,6 @@ def getAllMovies(categories, locations):
 	for category in categories:
 		for location in locations:
 			movieList.append(getMovies(category, location))
-			#print(getMovies(category, location))
-			#print(getMovies('爱情', '大陆'))
-			#print(category)
-			#print(location)
-
-			#print(movieList)
 	return sum(movieList, [])
 
 """
@@ -178,45 +156,72 @@ def getAllMovies(categories, locations):
 
 
 """
-#myMovies = getAllMovies(['爱情'], ['全部地区'])
-#print(myMovies)
-
-
 #把每一条电影信息，从一个完全的str，变成可以操作的list
 def splitDetails(list):
 	return [item.split(',') for item in list]
 
 #选择评分9或以上的电影
 def rate9(movies):
-	movieList = []
+	movie9List = []
 	for movie in movies:
-		if float(movie[1]) >= 9.0:
-			movieList.append(movie)
-	return movieList
+		if movie[1] != 'None' and float(movie[1]) >= 9.0:
+			movie9List.append(movie)
+	return movie9List
 
-#print(rate9(splitDetails(getMovies('爱情', '大陆'))))
+myMovies = splitDetails(getAllMovies(['音乐','爱情','文艺'], ['大陆']))#‘全部地区’和'全部类型'，在url里为空
 
-#for test
-myMovies = rate9(splitDetails(getMovies('爱情', '大陆')))
+movies9 = rate9(myMovies)
+
+#for test：csvfile
+#movies9 = rate9(splitDetails(getMovies('爱情', '大陆')))
 
 #把结果写入csv文件
 import csv
-with open('movies.csv', 'w', newline='') as csvFile:# 设置newline，否则两行之间会空一行
-	spamwriter = csv.writer(csvFile)
-	for movie in myMovies:
+with open('movies.csv', 'w', newline='') as csv_file:# 设置newline，否则两行之间会空一行
+	spamwriter = csv.writer(csv_file)
+	for movie in movies9:
 		spamwriter.writerow(movie)
 
 """
 任务6: 统计电影数据
 
-统计你所选取的【每个电影类别】中，数量排名【前三】的【地区】有哪些，分别占此类别电影总数的【百分比】为多少？
+统计你【所选取】的【每个电影类别】中，数量排名【前三】的【地区】有哪些，分别占此类别电影总数的【百分比】为多少？
 
-你可能需要自己把这个任务拆分成多个步骤，统计每个类别的电影个数，统计每个类别每个地区的电影个数，排序找到最大值，做一定的数学运算等等，相信你一定可以的！
+你可能需要自己把这个任务拆分成多个步骤，
+统计每个【类别】的电影个数，
+统计每个【类别】每个【地区】的电影个数，
+排序找到【最大值】，做一定的数学运算等等，相信你一定可以的！
 
 请将你的结果【输出文件】 【output.txt】
 """
+#【全部地区】的【爱情】电影
+love_movies = splitDetails(getAllMovies(['爱情'],['大陆','日本','香港','台湾']))#‘全部地区’在url里为空
+music_movies = splitDetails(getAllMovies(['音乐'],['大陆','日本','香港','台湾']))
+art_movies = splitDetails(getAllMovies(['文艺'],['大陆','日本','香港','台湾']))
+
+#all_loctions = ['大陆','美国','香港','台湾','日本','韩国','英国','法国','意大利','西班牙','印度','泰国','俄罗斯','伊朗','加拿大','澳大利亚','爱尔兰','瑞典','巴西','丹麦']
+
+
+def getTop3(movies):
+	movie_dict = {}
+	for movie in movies:
+		if movie[2] not in movie_dict:
+			movie_dict[movie[2]] = 1
+		else:
+			movie_dict[movie[2]] += 1
+	movie_dict_sorted = sorted(movie_dict.items(),key = lambda x:x[1], reverse = True)#返回一个list
+	return movie_dict_sorted[0][0],movie_dict_sorted[1][0],movie_dict_sorted[2][0]
+
+#print(getTop3(love_movies))
+def printTop3(movies):
+	loc1,loc2,loc3 = getTop3(movies)
+	return "The top-3 movies are: {}, {} and {}".format(loc1,loc2,loc3)
+
+with open("output.txt", "w") as text_file:
+    print(printTop3(love_movies), file=text_file)
 
 """
+
 请提交submit.zip, 包含以下文件：
 
 DoubanCrawler.py
@@ -225,5 +230,6 @@ output.txt
 
 不要提交其他任何文件
 
-注意运行 python 【DoubanCrawler.py】 后，脚本应该会在同一个文件夹【生成】 movies.csv 和 output.txt 两个文件。
+注意运行 python 【DoubanCrawler.py】 后，
+脚本应该会在同一个文件夹【生成】 movies.csv 和 output.txt 两个文件。
 """
