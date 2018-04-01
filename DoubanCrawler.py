@@ -17,6 +17,10 @@ tags=电影: 标签为电影
 
 实现函数构造对应【类型】和【地区】的【URL地址】
 """
+import expanddouban
+from bs4 import BeautifulSoup
+import csv
+import codecs
 
 def getMovieUrl(category, location):
 	"""
@@ -54,9 +58,6 @@ getHtml 还有【两个可选参数:多页，翻页等待时间】，你 【很�
 #url = "https://movie.douban.com/tag/#/?sort=S&range=9,10&tags=电影,剧情,美国"
 #html = expanddouban.getHtml(url)
 ##print(html)
-
-import expanddouban
-from bs4 import BeautifulSoup
 
 """
 任务3: 定义电影类
@@ -172,8 +173,6 @@ for child in soup.find(class_='tags').find(class_='category').next_sibling.next_
 myMovies = getAllMovies(['音乐','爱情','文艺'], ['大陆','香港'])#‘全部地区’和'全部类型'，在url里为空
 
 #把结果myMovies写入csv文件
-import csv
-import codecs
 with codecs.open('movies.csv','w','utf_8_sig') as csv_file:
 #with open('movies.csv', 'w', newline='') as csv_file:# 设置newline，否则两行之间会空一行
 	spamwriter = csv.writer(csv_file)
