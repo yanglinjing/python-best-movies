@@ -124,7 +124,7 @@ def getMovies(category, location):
 		info_link = child.get('href')#找到链接，见BeautifulSoup“从文档中找到所有<a>标签的链接”
 		cover_link = child.find('img').get('src')
 
-		#建立新实例，并添加到list
+		#建立新实例，用print_movie方法变成str，并添加到list
 		m = Movie(name, rate, location, category, info_link, cover_link).print_movie()
 		movieList.append(m)
 
@@ -170,16 +170,41 @@ def rate9(movies):
 
 all_locations = ['大陆','美国','香港','台湾','日本','韩国','英国','法国','意大利','西班牙','印度','泰国','俄罗斯','伊朗','加拿大','澳大利亚','爱尔兰','瑞典','巴西','丹麦']
 
-myMovies = splitDetails(getAllMovies(['音乐','爱情','文艺'], all_locations))#‘全部地区’和'全部类型'，在url里为空
+"""
+地区自动获取：
+locationList=[]
+#用两个next_sibling调出“地区”选项
+for child in soup.find(class_='tags').find(class_='category').next_sibling.next_sibling:
+    location=child.find(class_='tag').get_text()
+    if location!='全部地区':
+        locationList.append(location)
+"""
+
+myMovies = splitDetails(getAllMovies(['音乐','爱情','文艺'], ['大陆','日本']))#‘全部地区’和'全部类型'，在url里为空
 
 movies9 = rate9(myMovies)
 
 #把结果movies9写入csv文件
 import csv
-with open('movies.csv', 'w', newline='') as csv_file:# 设置newline，否则两行之间会空一行
+import codecs
+with codecs.open('movies.csv','w','utf_8_sig') as csv_file:
+#with open('movies.csv', 'w', newline='') as csv_file:# 设置newline，否则两行之间会空一行
 	spamwriter = csv.writer(csv_file)
 	for movie in movies9:
 		spamwriter.writerow(movie)
+
+"""
+爬取的电影信息中包含【中文】，如果在导出的时候不指定编码格式，
+最后导出的csv使用excel打开会显示乱码，这里建议使用codecs模块解决：
+
+import codecs
+...
+with codecs.open('movies.csv','w','utf_8_sig') as f:
+...
+这里先将codecs模块导入，然后使用codecs.open()指定编码格式，这样导出的文件中就不会出现乱码。
+
+"""
+
 
 """
 任务6: 统计电影数据
@@ -209,7 +234,10 @@ def getPercentage(movies,i):
 	for movie in movies:
 		if movie[2]==getTop3(movies)[i]:
 			n+=1
-	return round((n/len(movies)) *100,2)
+	#return round((n/len(movies)) *100,2)
+	return n/len(movies)
+#在指定 format 格式时，可以使用下面这种格式，这样就不用手动给百分比乘 100 了：
+#print("{:.2%} percent.".format(percentage))
 
 #打印
 def printTop3(category,movies):
@@ -217,7 +245,7 @@ def printTop3(category,movies):
 	p1 = getPercentage(movies,0)
 	p2 = getPercentage(movies,1)
 	p3 = getPercentage(movies,2)
-	return "The top-3 {} movies are: {}, {} and {}, occupying {}%, {}% and {}%, respectively".format(category,loc1,loc2,loc3,p1,p2,p3)
+	return "The top-3 {} movies are: {}, {} and {}, occupying {:.2%}, {:.2%} and {:.2%}, respectively".format(category,loc1,loc2,loc3,p1,p2,p3)
 
 #【全部地区】的【爱情】【音乐】【文艺】电影
 love_movies = splitDetails(getAllMovies(['爱情'],['大陆','日本','香港']))#‘全部地区’在url里为空
