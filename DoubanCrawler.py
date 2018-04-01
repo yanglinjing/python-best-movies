@@ -213,15 +213,8 @@ def getTop3(movies):
 		else:
 			movie_dict[movie[2]] += 1
 	movie_dict_sorted = sorted(movie_dict.items(),key = lambda x:x[1], reverse = True)#返回一个list
-	return movie_dict_sorted[0][0],movie_dict_sorted[1][0],movie_dict_sorted[2][0]
+	return movie_dict_sorted[0][0],movie_dict_sorted[1][0],movie_dict_sorted[2][0],movie_dict_sorted[0][1]/len(movies),movie_dict_sorted[1][1]/len(movies),movie_dict_sorted[2][1]/len(movies)
 
-def getPercentage(movies,i):
-	n=0
-	for movie in movies:
-		if movie[2]==getTop3(movies)[i]:
-			n+=1
-	#return round((n/len(movies)) *100,2)
-	return n/len(movies)
 """
 在指定 format 格式时，可以使用下面这种格式，这样就不用手动给百分比乘 100 了：
 print("{:.2%} percent.".format(percentage))
@@ -229,10 +222,7 @@ print("{:.2%} percent.".format(percentage))
 
 #打印
 def printTop3(category,movies):
-	loc1,loc2,loc3 = getTop3(movies)
-	p1 = getPercentage(movies,0)
-	p2 = getPercentage(movies,1)
-	p3 = getPercentage(movies,2)
+	loc1,loc2,loc3,p1,p2,p3 = getTop3(movies)
 	return "The top-3 {} movies are: {}, {} and {}, occupying {:.2%}, {:.2%} and {:.2%}, respectively".format(category,loc1,loc2,loc3,p1,p2,p3)
 
 #【全部地区】的【爱情】【音乐】【文艺】电影
