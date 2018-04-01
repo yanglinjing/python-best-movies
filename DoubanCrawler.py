@@ -170,7 +170,7 @@ for child in soup.find(class_='tags').find(class_='category').next_sibling.next_
         locationList.append(location)
 """
 
-myMovies = getAllMovies(['音乐','爱情','文艺'], ['大陆','香港'])#‘全部地区’和'全部类型'，在url里为空
+myMovies = getAllMovies(['音乐','爱情','文艺'], all_locations)#‘全部地区’和'全部类型'，在url里为空
 
 #把结果myMovies写入csv文件
 with codecs.open('movies.csv','w','utf_8_sig') as csv_file:
@@ -236,9 +236,9 @@ def printTop3(category,movies):
 	return "The top-3 {} movies are: {}, {} and {}, occupying {:.2%}, {:.2%} and {:.2%}, respectively".format(category,loc1,loc2,loc3,p1,p2,p3)
 
 #【全部地区】的【爱情】【音乐】【文艺】电影
-love_movies = getAllMovies(['爱情'],['大陆','日本','香港'])#‘全部地区’在url里为空
-music_movies = getAllMovies(['音乐'],['大陆','日本','台湾'])
-art_movies = getAllMovies(['文艺'],['大陆','香港','台湾'])
+love_movies = getAllMovies(['爱情'],all_locations)#‘全部地区’在url里为空
+music_movies = getAllMovies(['音乐'],all_locations)
+art_movies = getAllMovies(['文艺'],all_locations)
 
 #输出到文件txt
 with open("output.txt", "w") as text_file:
