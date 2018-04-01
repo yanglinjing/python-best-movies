@@ -90,11 +90,9 @@ class Movie(object):
 		self.info_link = info_link
 		self.cover_link = cover_link
 
-#def print_movie(self):
-	#return "{},{},{},{},{},{}".format(self.name,self.rate,self.location,self.category,self.info_link,self.cover_link)#如果没有这个方法，Movie的每个实例输出为<__main__.Movie object at 0x05977410>
-
 	def getOneMovie(self):
 		return self.name, self.rate, self.location, self.category, self.info_link, self.cover_link
+		#如果没有这个方法，Movie的每个实例输出为<__main__.Movie object at 0x05977410>
 
 
 """
@@ -158,17 +156,6 @@ def getAllMovies(categories, locations):
 
 
 """
-#把每一条电影信息，从一个完全的str，变成可以操作的list
-#def splitDetails(list):
-	#return [item.split(',') for item in list]
-
-#选择评分9或以上的电影
-def rate9(movies):
-	movie9List = []
-	for movie in movies:
-		if movie[1] != 'None' and float(movie[1]) >= 9.0:
-			movie9List.append(movie)
-	return movie9List
 
 all_locations = ['大陆','美国','香港','台湾','日本','韩国','英国','法国','意大利','西班牙','印度','泰国','俄罗斯','伊朗','加拿大','澳大利亚','爱尔兰','瑞典','巴西','丹麦']
 
@@ -182,11 +169,9 @@ for child in soup.find(class_='tags').find(class_='category').next_sibling.next_
         locationList.append(location)
 """
 
-myMovies = getAllMovies(['音乐','爱情','文艺'], ['大陆','日本'])#‘全部地区’和'全部类型'，在url里为空
+myMovies = getAllMovies(['音乐','爱情','文艺'], ['大陆','香港'])#‘全部地区’和'全部类型'，在url里为空
 
-#movies9 = rate9(myMovies)
-
-#把结果movies9写入csv文件
+#把结果myMovies写入csv文件
 import csv
 import codecs
 with codecs.open('movies.csv','w','utf_8_sig') as csv_file:
