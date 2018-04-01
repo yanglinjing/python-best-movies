@@ -1,3 +1,3 @@
-The top-3 love movies are: 日本, 大陆 and 香港, occupying 57.14%, 22.86% and 20.00%, respectively
-The top-3 music movies are: 日本, 大陆 and 台湾, occupying 56.60%, 28.30% and 15.09%, respectively
-The top-3 art movies are: 大陆, 香港 and 台湾, occupying 50.00%, 28.57% and 21.43%, respectively
+锘縏he top-3 love movies are: 鏃ユ湰, 澶ч檰 and 棣欐腐, occupying 57.14%, 22.86% and 20.0%, respectively
+The top-3 music movies are: 鏃ユ湰, 澶ч檰 and 鍙版咕, occupying 56.6%, 28.3% and 15.09%, respectively
+The top-3 art movies are: 澶ч檰, 棣欐腐 and 鍙版咕, occupying 50.0%, 28.57% and 21.43%, respectively
