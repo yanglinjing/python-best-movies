@@ -23,12 +23,10 @@ def getMovieUrl(category, location):
 	return a string corresponding to
 	the URL of douban movie lists
 	given category and location.
+	rate >=9
 	"""
 	url = "https://movie.douban.com/tag/#/?sort=S&range=9,10&tags=电影,{},{}".format(category, location)
 	return url
-#print(getMovieUrl("movie", "China"))
-
-
 
 """
 任务2: 获取电影页面 HTML
@@ -84,16 +82,20 @@ m = Movie(name, rate, location, category, info_link, cover_link)
 """
 class Movie(object):
 
-    def __init__(self, name, rate, location, category, info_link, cover_link):
-        self.name = name
-        self.rate = rate
-        self.location = location
-        self.category = category
-        self.info_link = info_link
-        self.cover_link = cover_link
+	def __init__(self, name, rate, location, category, info_link, cover_link):
+		self.name = name
+		self.rate = rate
+		self.location = location
+		self.category = category
+		self.info_link = info_link
+		self.cover_link = cover_link
 
-    def print_movie(self):
-        return "{},{},{},{},{},{}".format(self.name,self.rate,self.location,self.category,self.info_link,self.cover_link)#如果没有这个方法，Movie的每个实例输出为<__main__.Movie object at 0x05977410>
+#def print_movie(self):
+	#return "{},{},{},{},{},{}".format(self.name,self.rate,self.location,self.category,self.info_link,self.cover_link)#如果没有这个方法，Movie的每个实例输出为<__main__.Movie object at 0x05977410>
+
+	def getOneMovie(self):
+		return self.name, self.rate, self.location, self.category, self.info_link, self.cover_link
+
 
 """
 任务4: 获得豆瓣电影的信息
@@ -124,8 +126,8 @@ def getMovies(category, location):
 		info_link = child.get('href')#找到链接，见BeautifulSoup“从文档中找到所有<a>标签的链接”
 		cover_link = child.find('img').get('src')
 
-		#建立新实例，用print_movie方法变成str，并添加到list
-		m = Movie(name, rate, location, category, info_link, cover_link).print_movie()
+		#建立新实例，用getOneMovie方法变成tuple，并添加到list
+		m = Movie(name, rate, location, category, info_link, cover_link).getOneMovie()
 		movieList.append(m)
 
 	return movieList
@@ -157,8 +159,8 @@ def getAllMovies(categories, locations):
 
 """
 #把每一条电影信息，从一个完全的str，变成可以操作的list
-def splitDetails(list):
-	return [item.split(',') for item in list]
+#def splitDetails(list):
+	#return [item.split(',') for item in list]
 
 #选择评分9或以上的电影
 def rate9(movies):
@@ -180,9 +182,9 @@ for child in soup.find(class_='tags').find(class_='category').next_sibling.next_
         locationList.append(location)
 """
 
-myMovies = splitDetails(getAllMovies(['音乐','爱情','文艺'], ['大陆','日本']))#‘全部地区’和'全部类型'，在url里为空
+myMovies = getAllMovies(['音乐','爱情','文艺'], ['大陆','日本'])#‘全部地区’和'全部类型'，在url里为空
 
-movies9 = rate9(myMovies)
+#movies9 = rate9(myMovies)
 
 #把结果movies9写入csv文件
 import csv
@@ -190,7 +192,7 @@ import codecs
 with codecs.open('movies.csv','w','utf_8_sig') as csv_file:
 #with open('movies.csv', 'w', newline='') as csv_file:# 设置newline，否则两行之间会空一行
 	spamwriter = csv.writer(csv_file)
-	for movie in movies9:
+	for movie in myMovies:
 		spamwriter.writerow(movie)
 
 """
@@ -236,8 +238,10 @@ def getPercentage(movies,i):
 			n+=1
 	#return round((n/len(movies)) *100,2)
 	return n/len(movies)
-#在指定 format 格式时，可以使用下面这种格式，这样就不用手动给百分比乘 100 了：
-#print("{:.2%} percent.".format(percentage))
+"""
+在指定 format 格式时，可以使用下面这种格式，这样就不用手动给百分比乘 100 了：
+print("{:.2%} percent.".format(percentage))
+"""
 
 #打印
 def printTop3(category,movies):
@@ -248,9 +252,9 @@ def printTop3(category,movies):
 	return "The top-3 {} movies are: {}, {} and {}, occupying {:.2%}, {:.2%} and {:.2%}, respectively".format(category,loc1,loc2,loc3,p1,p2,p3)
 
 #【全部地区】的【爱情】【音乐】【文艺】电影
-love_movies = splitDetails(getAllMovies(['爱情'],['大陆','日本','香港']))#‘全部地区’在url里为空
-music_movies = splitDetails(getAllMovies(['音乐'],['大陆','日本','台湾']))
-art_movies = splitDetails(getAllMovies(['文艺'],['大陆','香港','台湾']))
+love_movies = getAllMovies(['爱情'],['大陆','日本','香港'])#‘全部地区’在url里为空
+music_movies = getAllMovies(['音乐'],['大陆','日本','台湾'])
+art_movies = getAllMovies(['文艺'],['大陆','香港','台湾'])
 
 #输出到文件txt
 with open("output.txt", "w") as text_file:
